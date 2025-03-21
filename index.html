@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Giełdowy</title>
+    <script>
+        let capital = 1000;
+        let stocks = { TVS: 0, ECO: 0, HPL: 0, ADR: 0 };
+        let round = 1;
+        let prices = { TVS: 265, ECO: 18, HPL: 110, ADR: 50 };
+        let tvsPrices = [210, 218, 151, 240, 242];
+        let hplPrices = [110, 105, 88, 162, 123];
+        let ecoPrices = [8, 20, 21, 20, 15];
+        let adrPrices = [71, 72, 75, 76, 49];
+
+        function updateStatus() {
+            document.getElementById("capital").innerText = capital + " zł";
+            document.getElementById("stocks").innerText = JSON.stringify(stocks);
+            document.getElementById("round").innerText = round;
+            document.getElementById("prices").innerText = JSON.stringify(prices);
+        }
+
+        function nextRound() {
+            if (round < 5) {
+                prices.TVS = tvsPrices[round];
+                prices.ECO = ecoPrices[round];
+                prices.HPL = hplPrices[round];
+                prices.ADR = adrPrices[round];
+                round++;
+                updateStatus();
+            } else {
+                alert("Koniec gry! Twój kapitał końcowy: " + capital + " zł");
+                location.reload();
+            }
+        }
+
+        function buyStock() {
+            let stock = document.getElementById("stock-select").value;
+            let quantity = parseInt(document.getElementById("quantity").value);
+            let cost = prices[stock] * quantity;
+            if (capital >= cost && quantity > 0) {
+                stocks[stock] += quantity;
+                capital -= cost;
+                updateStatus();
+            } else {
+                alert("Nie masz wystarczających środków lub podano niepoprawną ilość.");
+            }
+        }
+
+        function sellStock() {
+            let stock = document.getElementById("stock-select").value;
+            let quantity = parseInt(document.getElementById("quantity").value);
+            if (stocks[stock] >= quantity && quantity > 0) {
+                capital += prices[stock] * quantity;
+                stocks[stock] -= quantity;
+                updateStatus();
+            } else {
+                alert("Nie masz wystarczającej liczby akcji lub podano niepoprawną ilość.");
+            }
+        }
+    </script>
+</head>
+<body onload="updateStatus()">
+    <h1>Quiz Giełdowy</h1>
+    <p>Kapitał: <span id="capital"></span></p>
+    <p>Twoje akcje: <span id="stocks"></span></p>
+    <p>Ceny akcji: <span id="prices"></span></p>
+    <p>Runda: <span id="round"></span>/5</p>
+    
+    <label for="stock-select">Wybierz akcję:</label>
+    <select id="stock-select">
+        <option value="TVS">TechVision (TVS)</option>
+        <option value="ECO">EcoEnergy (ECO)</option>
+        <option value="HPL">HealthPlus (HPL)</option>
+        <option value="ADR">AutoDrive (ADR)</option>
+    </select>
+    
+    <label for="quantity">Liczba akcji:</label>
+    <input type="number" id="quantity" min="1" value="1">
+    
+    <button onclick="buyStock()">Kup akcje</button>
+    <button onclick="sellStock()">Sprzedaj akcje</button>
+    <button onclick="nextRound()">Następna runda</button>
+</body>
+</html>
